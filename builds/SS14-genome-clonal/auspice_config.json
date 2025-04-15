@@ -1,0 +1,76 @@
+{
+	"title": "Global Perspective on Treponema pallidum",
+	"maintainers": [
+		{
+			"name": "Simon Hackl",
+			"url": "https://uni-tuebingen.de/fakultaeten/mathematisch-naturwissenschaftliche-fakultaet/fachbereiche/informatik/lehrstuehle/integrative-transkriptomik/gruppe/simon-hackl/"
+		}
+	],
+	"build_url": "#",
+	"colorings": [
+		{
+			"key": "subspecies",
+			"title": "Subspecies",
+			"type": "categorical"
+		},
+		{
+			"key": "lineage",
+			"title": "Lineage",
+			"type": "categorical"
+		},
+		{
+			"key": "alleles_bamA",
+			"title": "bamA Proteoforms",
+			"type": "categorical"
+		},
+		{
+			"key": "bioproject",
+			"title": "Bioproject",
+			"type": "categorical"
+		},
+		{
+			"key": "country",
+			"title": "Country",
+			"type": "categorical"
+		},
+		{
+			"key": "region",
+			"title": "Region",
+			"type": "categorical"
+		},
+		{
+			"key": "coverage",
+			"title": "Mean coverage",
+			"type": "continuous"
+		},
+		{
+			"key": "ambiguity",
+			"title": "N positions (%)",
+			"type": "continuous"
+		},
+		{
+			"key": "host",
+			"title": "Host",
+			"type": "categorical"
+		}
+	],
+	"geo_resolutions": [
+		"country",
+		"region"
+	],
+	"filters": [
+		"country",
+		"subspecies"
+	],
+	"display_defaults": {
+		"color_by": "subspecies",
+		"geo_resolution": "country",
+		"distance_measure": "div",
+		"map_triplicate": false,
+		"layout": "rect",
+		"tip_label": "Sample Name",
+		"sidebar": "closed",
+		"transmission_lines": false,
+		"language": "English"
+	}
+}

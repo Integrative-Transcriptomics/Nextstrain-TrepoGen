@@ -1,0 +1,235 @@
+_reference = "SS14"
+_feature = "genome"
+_mask = "clonal"
+_variants_type = "snv"
+_source_date = "10_03_2025"
+
+
+rule all:
+    input:
+        reference_sequence="source/reference/{}.fasta".format(_reference),
+        reference_features="source/reference/{}.gff3".format(_reference),
+        variants="source/variants/{}-{}-{}-{}.vcf".format(
+            _reference,
+            _source_date,
+            _variants_type,
+            _feature,
+        ),
+        meta_data="source/meta/{}-{}.tsv".format(
+            _reference,
+            _source_date,
+        ),
+        exclude_strains="builds/{}-{}-{}/exclude_strains.txt".format(
+            _reference, _feature, _mask
+        ),
+        exclude_sites="builds/{}-{}-{}/exclude_sites.txt".format(
+            _reference, _feature, _mask
+        ),
+        genes="builds/{}-{}-{}/genes.txt".format(_reference, _feature, _mask),
+        types_bamA="builds/{}-{}-{}/types_bamA.tsv".format(_reference, _feature, _mask),
+        color="builds/{}-{}-{}/color.tsv".format(_reference, _feature, _mask),
+        auspice_config="builds/{}-{}-{}/auspice_config.json".format(
+            _reference, _feature, _mask
+        ),
+        auspice_description="builds/{}-{}-{}/auspice_description.md".format(
+            _reference, _feature, _mask
+        ),
+        auspice_json="auspice/{}_{}_{}.json".format(
+            _reference,
+            _feature,
+            _mask,
+        ),
+
+
+rule filter:
+    input:
+        variants=rules.all.input.variants,
+        metadata=rules.all.input.meta_data,
+        exclude_strains=rules.all.input.exclude_strains,
+    output:
+        variants_filtered="work/variants.vcf",
+    shell:
+        """
+        augur filter --sequences {input.variants} \
+            --metadata {input.metadata} \
+            --metadata-id-columns sra \
+            --exclude {input.exclude_strains} \
+            --output {output.variants_filtered}
+        """
+
+
+rule tree:
+    input:
+        variants=rules.filter.output.variants_filtered,
+        reference=rules.all.input.reference_sequence,
+        exclude_sites=rules.all.input.exclude_sites,
+    output:
+        tree="work/tree.initial.nwk",
+    params:
+        nt=6,
+        method="iqtree",
+        model="GTR+F+ASC+R2",
+    shell:
+        """
+        augur tree --alignment {input.variants} \
+            --vcf-reference {input.reference} \
+            --nthreads {params.nt} \
+            --method {params.method} \
+            --substitution-model {params.model} \
+            --exclude-sites {input.exclude_sites} \
+            --output {output.tree}
+        """
+
+
+rule refine:
+    input:
+        tree=rules.tree.output.tree,
+        variants=rules.filter.output.variants_filtered,
+        metadata=rules.all.input.meta_data,
+        reference=rules.all.input.reference_sequence,
+    output:
+        tree="work/tree.refined.nwk",
+        branch_lengths="work/tree.branch_lengths.json",
+    params:
+        meta_id_col="sra",
+        cr=0.0000302,
+        cr_std=0.000023,
+        iter=2,
+        prec=3,
+    shell:
+        """
+        augur refine --tree {input.tree} \
+            --alignment {input.variants} \
+            --vcf-reference {input.reference} \
+            --metadata {input.metadata} \
+            --metadata-id-columns {params.meta_id_col} \
+            --timetree \
+            --max-iter {params.iter} \
+            --root mid_point \
+            --covariance \
+            --stochastic-resolve \
+            --precision {params.prec} \
+            --coalescent opt \
+            --clock-rate {params.cr} \
+            --clock-std-dev {params.cr_std} \
+            --date-format %Y-%m-%d \
+            --date-inference joint \
+            --date-confidence \
+            --year-bounds 2023 2000 \
+            --seed 42 \
+            --branch-length-inference joint \
+            --output-tree {output.tree} \
+            --output-node-data {output.branch_lengths}
+        """
+
+
+rule ancestral:
+    input:
+        tree=rules.refine.output.tree,
+        variants=rules.filter.output.variants_filtered,
+        reference=rules.all.input.reference_sequence,
+    output:
+        nucleotide_mutations_node_data="work/nucleotide.mutations.json",
+        nucleotide_mutations="work/nucleotide.mutations.vcf",
+    shell:
+        """
+        augur ancestral --tree {input.tree} \
+            --alignment {input.variants} \
+            --vcf-reference {input.reference} \
+            --inference joint \
+            --output-node-data {output.nucleotide_mutations_node_data} \
+            --output-vcf {output.nucleotide_mutations}
+        """
+
+
+rule translate:
+    input:
+        tree=rules.refine.output.tree,
+        reference=rules.all.input.reference_sequence,
+        features=rules.all.input.reference_features,
+        variants=rules.ancestral.output.nucleotide_mutations,
+        genes=rules.all.input.genes,
+    output:
+        aminoacid_mutations_node_data="work/aminoacid.mutations.json",
+        aminoacid_mutations="work/aminoacid.mutations.vcf",
+        aminoacid_reference="work/aminoacid.reference.fasta",
+    shell:
+        """
+        augur translate --tree {input.tree} \
+            --vcf-reference {input.reference} \
+            --ancestral-sequences {input.variants} \
+            --genes {input.genes} \
+            --reference-sequence {input.features} \
+            --output-node-data {output.aminoacid_mutations_node_data} \
+            --alignment-output {output.aminoacid_mutations} \
+            --vcf-reference-output {output.aminoacid_reference}
+        """
+
+
+rule traits:
+    input:
+        tree=rules.refine.output.tree,
+        metadata=rules.all.input.meta_data,
+    output:
+        traits="work/traits.json",
+    params:
+        traits="subspecies country region date",
+    shell:
+        """
+        augur traits --tree {input.tree} \
+            --metadata {input.metadata} \
+            --metadata-id-columns sra \
+            --columns {params.traits} \
+            --output-node-data {output}
+        """
+
+
+rule types_bamA:
+    input:
+        tree=rules.refine.output.tree,
+        aminoacid_mutations=rules.translate.output.aminoacid_mutations_node_data,
+        nucleotide_mutations=rules.ancestral.output.nucleotide_mutations_node_data,
+        definition=rules.all.input.types_bamA,
+    output:
+        node_data="results/types_bamA.json",
+    shell:
+        """
+        augur clades --tree {input.tree} \
+            --mutations {input.nucleotide_mutations} {input.aminoacid_mutations} \
+            --clades {input.definition} \
+            --membership-name alleles_bamA \
+            --label-name alleles_bamA \
+            --output-node-data {output.node_data}
+        """
+
+
+rule export:
+    input:
+        tree=rules.refine.output.tree,
+        metadata=rules.all.input.meta_data,
+        branch_lengths=rules.refine.output.branch_lengths,
+        traits=rules.traits.output.traits,
+        nucleotide_mutations=rules.ancestral.output.nucleotide_mutations_node_data,
+        aminoacid_mutations=rules.translate.output.aminoacid_mutations_node_data,
+        color_defs=rules.all.input.color,
+        auspice_config=rules.all.input.auspice_config,
+        auspice_description=rules.all.input.auspice_description,
+        geo_info="source/geo/geoloc.tsv",
+        alleles_bamA=rules.types_bamA.output.node_data,
+    output:
+        auspice_json=rules.all.input.auspice_json,
+    shell:
+        """
+        augur export v2 \
+            --tree {input.tree} \
+            --metadata {input.metadata} \
+            --metadata-id-columns sra \
+            --node-data {input.branch_lengths} {input.traits} {input.nucleotide_mutations} {input.aminoacid_mutations} {input.alleles_bamA} \
+            --auspice-config {input.auspice_config} \
+            --description {input.auspice_description} \
+            --colors {input.color_defs} \
+            --lat-longs {input.geo_info} \
+            --output {output.auspice_json} \
+            --include-root-sequence \
+            --minify-json
+        """
