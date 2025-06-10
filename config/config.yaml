@@ -1,0 +1,25 @@
+refine.precision: 3
+refine.iterations: 3
+seed: 17
+
+tpass308:
+  reference_sample: "CP004011"
+  meta_identifier: "sra"
+  filter.query: "--query-columns ambiguity:float coverage:float --query '(coverage >= 3) & (ambiguity <= 20)'"
+  refine.year_bounds: "--year-bounds 2023 2000"
+  refine.root: "--root CP004011"
+  traits.columns: "subspecies country region date"
+
+tpass2930:
+  reference_sample: "CP004011"
+  meta_identifier: "sra"
+  filter.query: "--query-columns ambiguity:float coverage:float --query '(coverage >= 3) & (ambiguity <= 20)'"
+  refine_year_bounds: "--year-bounds 2023 2000"
+  refine.root: "--root CP004011"
+  traits.columns: "subspecies country region date"
+
+gene:
+  tree.method: "--method iqtree --substitution-model GTR+F+R"
+
+Tp0326:
+  refine.clock_rate: "--clock-rate 3.02e-7 --clock-std-dev 8.55e-8"
