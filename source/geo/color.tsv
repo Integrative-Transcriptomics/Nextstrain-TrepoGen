@@ -1,0 +1,220 @@
+region	Africa	#2ec38f
+region	China	#89a43b
+region	Asia	#89a43b
+region	Europe	#3e9587
+region	Japan/Korea	#a3863b
+region	North America	#8338ab
+region	Oceania	#e1781b
+region	South America	#2324d5
+region	South Asia	#57af37
+region	Southeast Asia	#b0c42d
+region	West Asia	#3aa550
+region	unassigned	#AAAAAA
+country	Afghanistan	#44a53a
+country	Albania	#3c9e7f
+country	Algeria	#38aba7
+country	American Samoa	#d62338
+country	Andorra	#3c9c9b
+country	Angola	#24d3a3
+country	Antigua and Barbuda	#3b34b6
+country	Argentina	#2811ed
+country	Armenia	#3c9e56
+country	Aruba	#4c32bb
+country	Australia	#e0b11b
+country	Austria	#3e9783
+country	Azerbaijan	#3c9e51
+country	Bahamas	#5e37ae
+country	Bahrain	#38ad4c
+country	Bangladesh	#72af37
+country	Barbados	#3432ba
+country	Belarus	#3f916b
+country	Belgium	#3e948f
+country	Belize	#7634b6
+country	Benin	#31bdba
+country	Bermuda	#453aa7
+country	Bhutan	#72ab38
+country	Bolivia	#3421d9
+country	Bonaire	#4832bb
+country	Bosnia and Herzegovina	#3d9b81
+country	Botswana	#1cdf92
+country	Brazil	#2535d2
+country	Brunei	#b5c32e
+country	Bulgaria	#3d9c75
+country	Burkina Faso	#32b4ba
+country	Burundi	#2acb7d
+country	Cabo Verde	#3480b7
+country	Cambodia	#97ba32
+country	Cameroon	#2ec3a4
+country	Canada	#7d3f8a
+country	Cayman Islands	#6235b3
+country	Central African Republic	#2fc092
+country	Chad	#33b890
+country	Chile	#4215e7
+country	China	#89a63a
+country	Colombia	#532dc4
+country	Costa Rica	#6c31bd
+country	Côte d'Ivoire	#30afbf
+country	Croatia	#3d9a84
+country	Cuba	#6437b0
+country	Curacao	#4a32bb
+country	Cyprus	#3ba46b
+country	Czech Republic	#3e9580
+country	Congo	#29cb93
+country	Denmark	#3f8e83
+country	Djibouti	#32bb5b
+country	Dominica	#3933b8
+country	Dominican Republic	#4e35b4
+country	Ecuador	#5e2bc8
+country	Egypt	#38ac72
+country	El Salvador	#7733b9
+country	Equatorial Guinea	#2cc6ad
+country	Estonia	#3f8c6c
+country	Eswatini	#1ae27c
+country	Ethiopia	#30be60
+country	Fiji	#da2320
+country	Finland	#3f896a
+country	France	#3d9997
+country	French Polynesia	#d82183
+country	Gabon	#2bc8ac
+country	Gambia	#3294ba
+country	Georgia	#3c9d58
+country	Germany	#3e9486
+country	Ghana	#30babf
+country	Gibraltar	#3b98a3
+country	Greece	#3ca07d
+country	Grenada	#3932bb
+country	Guadeloupe	#3a34b7
+country	Guam	#ba8232
+country	Guatemala	#7933b8
+country	Guinea	#31a1bc
+country	Guinea-Bissau	#3297bb
+country	Guyana	#2e2ec2
+country	Haiti	#5235b4
+country	Honduras	#7033b8
+country	Hong Kong	#a4b136
+country	Hungary	#3d987b
+country	Iceland	#406f86
+country	India	#5bb236
+country	Indonesia	#b8c82b
+country	Iran	#3aa44a
+country	Iraq	#3aa658
+country	Ireland	#3e8592
+country	Israel	#39a869
+country	Italy	#3d9b8a
+country	Cote d'Ivoire	#30afbf
+country	Jamaica	#5d35b5
+country	Japan	#a3813b
+country	Jordan	#39a865
+country	Kazakhstan	#48963e
+country	Kenya	#2cc767
+country	Kiribati	#c73c2c
+country	Kosovo	#3d9c7c
+country	Kuwait	#39aa52
+country	Kyrgyzstan	#539e3c
+country	Laos	#8fb335
+country	Latvia	#3f8e6e
+country	Lebanon	#3aa567
+country	Lesotho	#17e587
+country	Liberia	#2fa8c2
+country	Libya	#38ad8d
+country	Liechtenstein	#3d988b
+country	Lithuania	#3f8f70
+country	Luxembourg	#3e958e
+country	Macao	#a3b136
+country	Madagascar	#1fda4c
+country	Malawi	#23d573
+country	Malaysia	#96c32e
+country	Maldives	#4ec32e
+country	Mali	#34b0b7
+country	Malta	#3ba38c
+country	Marshall Islands	#c0452f
+country	Mauritania	#359db3
+country	Mauritius	#1edc28
+country	Mexico	#8b35b4
+country	Micronesia	#c06b2f
+country	Moldova	#3d976e
+country	Monaco	#3d9b91
+country	Mongolia	#7d973e
+country	Montenegro	#3d9c7e
+country	Morocco	#3a9ba6
+country	Mozambique	#1fdb70
+country	Myanmar	#80b236
+country	Namibia	#1cdfaa
+country	Nepal	#65ab38
+country	Netherlands	#3e938d
+country	New Zealand	#f1280d
+country	Nicaragua	#6f32bb
+country	Niger	#34b5a1
+country	Nigeria	#31bdad
+country	North Macedonia	#3c9d7c
+country	Norway	#3f8980
+country	Oman	#36b33e
+country	Pakistan	#4ba939
+country	Palau	#c2a32e
+country	Palestine	#3aa768
+country	Panama	#6230be
+country	Papua New Guinea	#cd8b28
+country	Paraguay	#1c1edf
+country	Peru	#5626d1
+country	Philippines	#bcb431
+country	Poland	#3e9379
+country	Portugal	#3c909f
+country	Puerto Rico	#4535b5
+country	Qatar	#37ae4a
+country	Congo	#2bc8a1
+country	Romania	#3d9974
+country	Russia	#6b8640
+country	Rwanda	#2ac97c
+country	Saint Barthélemy	#3d34b5
+country	Saint Kitts and Nevis	#3d34b6
+country	Saint Lucia	#3833b9
+country	Saint Martin	#3e34b5
+country	Saint Vincent and the Grenadines	#3832ba
+country	Sao Tome and Principe	#2cc6b7
+country	Saudi Arabia	#37ae56
+country	Senegal	#3396b9
+country	Serbia	#3d9b7c
+country	Seychelles	#29cc37
+country	Sierra Leone	#30a0bf
+country	Singapore	#9cc62c
+country	Sint Maarten	#3e34b5
+country	Slovakia	#3e967b
+country	Slovenia	#3d9984
+country	Solomon Islands	#d06226
+country	Somalia	#30bf4c
+country	South Africa	#18e592
+country	South Korea	#a2953b
+country	South Sudan	#30bf7a
+country	Spain	#3c979e
+country	Sri Lanka	#60bf30
+country	St. Lucia	#3833b9
+country	Sudan	#33b979
+country	Suriname	#2e34c3
+country	Sweden	#3f8b7a
+country	Switzerland	#3d988d
+country	Syria	#3aa461
+country	Taiwan	#afae37
+country	Tajikistan	#4da03c
+country	Tanzania	#28ce6d
+country	Thailand	#8db833
+country	Timor-Leste	#d0c026
+country	Togo	#30bebe
+country	Trinidad	#3731bd
+country	Trinidad and Tobago	#3731bc
+country	Tunisia	#3aa597
+country	Turkey	#3ca064
+country	Uganda	#2dc575
+country	Ukraine	#3e9569
+country	Union of the Comoros	#24d454
+country	United Arab Emirates	#37b044
+country	United Kingdom	#3f8c90
+country	Uruguay	#141ee9
+country	USA	#7f3ca0
+country	Uzbekistan	#429e3c
+country	Vanuatu	#d84521
+country	Venezuela	#4130bf
+country	Vietnam	#9bb734
+country	Yemen	#34b750
+country	Zambia	#22d686
+country	Zimbabwe	#20da80
+country	unassigned	#AAAAAA
