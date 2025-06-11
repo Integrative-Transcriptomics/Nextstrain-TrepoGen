@@ -3,5 +3,5 @@ musial: "/mnt/c/Users/siha/Desktop/Tools/MUSIAL-v2.4.1.jar"
 refine.precision: 3
 refine.iterations: 3
 export.title: "Global perspective on Treponema pallidum"
-export.maintainers: "'Simon Hackl https://uni-tuebingen.de/fakultaeten/mathematisch-naturwissenschaftliche-fakultaet/fachbereiche/informatik/lehrstuehle/integrative-transkriptomik/gruppe/simon-hackl/'"
-export.build_url: "'https://github.com/Integrative-Transcriptomics/Nextstrain-TrepoGen'"
+export.maintainers: "'Simon Hackl <https://uni-tuebingen.de/fakultaeten/mathematisch-naturwissenschaftliche-fakultaet/fachbereiche/informatik/lehrstuehle/integrative-transkriptomik/gruppe/simon-hackl/>'"
+export.build_url: "https://github.com/Integrative-Transcriptomics/Nextstrain-TrepoGen"
