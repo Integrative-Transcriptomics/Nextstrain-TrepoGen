@@ -93,7 +93,7 @@ rule filter:
 			shell("cp {input.variants} {output}")
 
 # Prepares a gene build by processing the reference genome, annotation, and variants into gene specific data.
-rule prepare:
+rule extract:
 	input:
 		reference="source/data/{source}/sequence.fasta",
 		annotation="source/data/{source}/annotation.gff3",
@@ -110,7 +110,7 @@ rule prepare:
 		root=lambda wc: config.get(wc.source).get("reference_sample", ""),
 	shell:
 		"""
-		python scripts/prepare_gene_build.py \
+		python scripts/gene_extract.py \
 			-ir {input.reference} \
 			-ia {input.annotation} \
 			-iv {input.variants} \
@@ -129,7 +129,7 @@ rule prepare:
 rule metadata:
 	input:
 		metadata_source="source/data/{source}/meta.csv",
-		metadata_gene=rules.prepare.output.gene_meta,
+		metadata_gene=rules.extract.output.gene_meta,
 	output:
 		".work/{source}_{subset}_{gene}/meta.csv"
 	params:
@@ -157,7 +157,7 @@ rule colors:
 # Builds the phylogenetic tree from the sequence alignment.
 rule tree:
 	input:
-		alignment=rules.prepare.output.sequences,
+		alignment=rules.extract.output.sequences,
 	output:
 		".work/{source}_{subset}_{gene}/initial.nwk",
 	params:
@@ -174,7 +174,7 @@ rule tree:
 # Refines the phylogenetic tree; performs date inference and branch length estimation.
 rule refine:
 	input:
-		alignment=rules.prepare.output.sequences,
+		alignment=rules.extract.output.sequences,
 		metadata=rules.metadata.output,
 		tree=rules.tree.output,
 	output:
@@ -215,8 +215,8 @@ rule refine:
 # Computes the ancestral sequences for the phylogenetic tree, inferring nucleotide mutations.
 rule ancestral:
 	input:
-		alignment=rules.prepare.output.sequences,
-		reference=rules.prepare.output.reference,
+		alignment=rules.extract.output.sequences,
+		reference=rules.extract.output.reference,
 		tree=rules.refine.output.tree,
 	output:
 		".work/{source}_{subset}_{gene}/nucleotide_mutations.json",
@@ -258,11 +258,11 @@ rule translate:
 	input:
 		tree=rules.refine.output.tree,
 		sequences=rules.ancestral.output,
-		annotation=rules.prepare.output.annotation,
+		annotation=rules.extract.output.annotation,
 	output:
 		".work/{source}_{subset}_{gene}/amino_acid_mutations.json",
 	params:
-		genes=rules.prepare.output.features,
+		genes=rules.extract.output.features,
 	shell:
 		"""
 		augur translate \
@@ -277,10 +277,10 @@ rule translate:
 rule export:
 	input:
 		tree=rules.refine.output.tree,
-		metadata=rules.metadata_metadata.output,
+		metadata=rules.metadata.output,
 		colors=rules.colors.output,
-		source_auspice_configuration="source/data/{source}/auspice_configuration.json",
-		gene_auspice_configuration=rules.prepare.output.gene_auspice_configuration,
+		source_config="source/data/{source}/auspice_configuration.json",
+		gene_config=rules.extract.output.gene_auspice_configuration,
 
 		description="source/data/{source}/auspice_description.md",
 
@@ -303,7 +303,7 @@ rule export:
 			--metadata {input.metadata} \
 			--metadata-id-columns {params.metadata_id} \
 			--node-data {input.branch_lengths} {input.traits} {input.nucleotide_mutations} {input.amino_acid_mutations} \
-			--auspice-config {input.source_configuration} {input.types_configuration} \
+			--auspice-config {input.source_config} {input.gene_config} \
 			--title {params.title} \
 			--maintainers {params.maintainers} \
 			--build-url {params.build_url} \
@@ -311,6 +311,5 @@ rule export:
 			--colors {input.colors} \
 			--lat-longs {input.coordinates} \
 			--output {output} \
-			--include-root-sequence-inline \
-			--minify-json
+			--include-root-sequence-inline
 		"""
