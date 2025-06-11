@@ -6,10 +6,10 @@ configfile: "config/genes.yaml"
 genes = list(config.get("genes", {}).keys())
 
 # sources: List of source datasets to use in the workflow. Expected to match one in source/data/<VAL>.
-sources = ["TPASS-308"]
+sources = ["TPASS-308", "TPASS-2930"]
 
 # subsets: List of variant subsets to use in the workflow. Expected to match one in source/data/*/variants/<VAL>.vcf
-subsets = ["snv"]
+subsets = ["snv", "snv-indel"]
 
 # source_files: List of files that are part of the source data. These files are expected to be present in the source/data/{source} directory.
 source_files = [
@@ -264,15 +264,22 @@ rule translate:
 		".work/{source}_{subset}_{gene}/amino_acid_mutations.json",
 	params:
 		genes=rules.extract.output.features,
-	shell:
-		"""
-		augur translate \
-			--tree {input.tree} \
-			--ancestral-sequences {input.sequences} \
-			--reference-sequence {input.annotation} \
-			--output-node-data {output} \
-			--genes {params.genes}
-		"""
+	run:
+		shell(
+			"""
+			augur translate \
+				--tree {input.tree} \
+				--ancestral-sequences {input.sequences} \
+				--reference-sequence {input.annotation} \
+				--output-node-data {output} \
+				--genes {params.genes}
+			"""
+		)
+		shell(
+			"""
+			python scripts/gene_recolor_annotations.py -f {output}
+			"""
+		)
 
 # Generates a description file for the dataset.
 rule describe:
