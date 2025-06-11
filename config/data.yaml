@@ -1,0 +1,15 @@
+TPASS-308:
+  reference_sample: "CP004011"
+  meta_identifier: "sra"
+  filter.query_cl: "--query-columns ambiguity:float coverage:float --query '(coverage >= 3) & (ambiguity <= 20)'"
+  refine.year_bounds_cl: "--year-bounds 2023 2000"
+  refine.root_cl: "--root CP004011"
+  traits.columns: "subspecies country region date"
+
+TPASS-2930:
+  reference_sample: "CP004011"
+  meta_identifier: "sra"
+  filter.query_cl: "--query-columns ambiguity:float coverage:float --query '(coverage >= 3) & (ambiguity <= 20)'"
+  refine.year_bounds_cl: "--year-bounds 2023 2000"
+  refine.root_cl: "--root CP004011"
+  traits.columns: "subspecies country region date"

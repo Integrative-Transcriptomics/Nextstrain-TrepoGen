@@ -1,0 +1,6 @@
+default: &default
+  tree.method_cl: "--method iqtree --substitution-model GTR+F+R"
+  refine.clock_rate_cl: "--clock-rate 3.02e-7 --clock-std-dev 8.55e-8"
+
+genes:
+  Tp0326: *default
