@@ -18,4 +18,10 @@ genes:
       #### Tp0326
 
        BamA (TP0326) is the central component of the molecular machinery that inserts newly exported OMPs into the spirochete’s outer membrane.
-       BamA in _Treponema palldium pallidum_ is bipartite and consists of a predicted 16-stranded β-barrel with eight extracellular loops (ECLs) and five polypeptide transport-associated (POTRA) domains within the periplasm.
+       BamA in _T. pallidum_ is bipartite and consists of a predicted 16-stranded β-barrel with eight extracellular loops (ECLs) and five polypeptide transport-associated (POTRA) domains within the periplasm.
+  Tp0865:
+    <<: *default
+    describe: |
+      #### Tp0865
+
+       TP0865, one of five FadL orthologs in _T. pallidum_, contains structural features found in canonical fatty acid transporters: a 14-stranded β-barrel with seven ECLs and an N-terminal hatch domain that plugs the lumen of the barrel.
