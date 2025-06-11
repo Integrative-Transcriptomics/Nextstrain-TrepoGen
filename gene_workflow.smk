@@ -37,6 +37,7 @@ work_files = [
 	"nucleotide_mutations.json", # Nucleotide mutations in JSON format for the tree.
 	"traits.json", # Traits in JSON format for the tree.
 	"amino_acid_mutations.json", # Amino acid mutations in JSON format for the tree.
+	"description.md", # Description file in Markdown format (MD) for the dataset.
 ]
 
 # Defines the directory structure and I/O files for each source, subset, and gene.
@@ -182,8 +183,8 @@ rule refine:
 		branch_lengths=".work/{source}_{subset}_{gene}/branch_lengths.json",
 	params:
 		seed=config.get("seed", 1),
-		iterations=config.get("refine.iterations", 1),
-		precision=config.get("refine.precision", 1),
+		iterations=config.get("refine", {}).get("iterations", 1),
+		precision=config.get("refine", {}).get("precision", 1),
 		metadata_id=lambda wc: config.get(wc.source).get("meta_identifier", "name strain id"),
 		clock_rate_cl=lambda wc: config.get("genes").get(wc.gene).get("refine.clock_rate_cl", ""),
 		root_cl=lambda wc: config.get(wc.source).get("refine.root_cl", ""),
@@ -273,6 +274,21 @@ rule translate:
 			--genes {params.genes}
 		"""
 
+# Generates a description file for the dataset.
+rule describe:
+	output:
+		".work/{source}_{subset}_{gene}/description.md",
+	params:
+		content="\n".join([
+			config.get("describe", {}).get("resources", ""),
+			config.get("describe", {}).get("background", ""),
+			config.get("describe", {}).get("funding", "")
+		]),
+	shell:
+		"""
+		echo '{params.content}' > {output}
+		"""
+
 # Exports the refined tree and associated data into a format suitable for visualization in Auspice.
 rule export:
 	input:
@@ -281,9 +297,7 @@ rule export:
 		colors=rules.colors.output,
 		source_config="source/data/{source}/auspice_configuration.json",
 		gene_config=rules.extract.output.gene_auspice_configuration,
-
-		description="source/data/{source}/auspice_description.md",
-
+		description=rules.describe.output,
 		coordinates="source/geo/loc.tsv",
 		branch_lengths=rules.refine.output.branch_lengths,
 		traits=rules.traits.output,
@@ -293,9 +307,9 @@ rule export:
 		".work/{source}_{subset}_{gene}/auspice.json",
 	params:
 		metadata_id=lambda wc: config.get(wc.source).get("meta_identifier", "name strain id"),
-		title=lambda wc: f"'{config.get('export.title', 'TrepoGen')} ({wc.gene})'",
-		maintainers=config.get("export.maintainers", ""),
-		build_url=config.get("export.build_url", ""),
+		title=lambda wc: f"'{config.get('export').get('title', 'TrepoGen')} ({wc.gene})'",
+		maintainers=config.get("export").get("maintainers"),
+		build_url=config.get("export").get("build_url"),
 	shell:
 		"""
 		augur export v2 \
