@@ -1,42 +1,26 @@
 #!/usr/bin/env python3
-"""Prepare data for a TrepoGen gene build using MUSIAL.
+"""Extract gene specific data for a Nextstrain-TrepoGen gene dataset.
 
 Description:
-	This script is designed to automate the preparation of gene-specific data for
-	genomic analysis, particularly focusing on extracting and formatting sequence
-	and annotation files for a specified gene. It uses several command-line arguments
-	to specify input files (such as a reference genome in FASTA format, an annotation
-	file in GFF3 format, a VCF file of variants, and the path to a MUSIAL JAR file),
-	as well as output file locations for the processed data.
+	This script prepares data for a TrepoGen gene dataset by
+	i. extracting gene-specific sequences using MUSIAL,
+	ii. processing the reference genome annotation to extract gene sub-features.
 
-	The workflow begins by parsing these arguments and writing a configuration file
-	for the MUSIAL tool, which is used for downstream genomic data processing. The
-	script then calls MUSIAL via subprocesses to build a storage object from the
-	provided data and to export gene-specific sequences. After MUSIAL generates the
-	sequence data, the script processes the resulting FASTA file to extract the
-	reference sequence for the gene of interest, reformatting it and writing it to
-	a new file with a standardized identifier.
-
-	The script then reads the original annotation file, extracts and modifies entries
-	relevant to the specified gene, and writes a new GFF3 annotation file with updated
-	coordinates and attributes. It also generates a text file listing the names of
-	gene sub-features, which can be useful for downstream analyses. This involves
-	handling insertions (gaps) in the reference sequence, which are represented by '-'
-	characters. The script identifies these gaps and records their positions and lengths,
-	allowing it to adjust the coordinates of features in the annotation file accordingly.
-	This ensures that the annotation remains accurate relative to the processed sequence.
-
-	Finally, the script prepares metadata for biological regions associated with the
-	gene, translating these regions into amino acid sequences and generating a CSV file
-	of per-sample region type metadata. During this process, it generates an Auspice 
-	configuration file wrt. color mappings for the specified biological regions.
+	The workflow first creates a MUSIAL storage file (including its configuration)
+	and exports a non-reference sequence alignment for the target gene. It then
+	parses the FASTA to extract and reformat the gene's reference sequence.
+	Next, it reads the original GFF3, updates entries and coordinates — accounting
+	for insertion-induced gaps — and writes a revised annotation plus a sub-feature
+	list for augur translate. Finally, it translates specified sub-features into
+	amino acid sequences, produces a CSV of per-sample sub-feature-type metadata,
+	and generates an Auspice configuration for Nextstrain visualization.
 
 Usage:
 	python prepare_gene_build.py
-		-r <reference.fasta>
-		-a <annotation.gff3>
-		-g <gene_name>
-		-i <variants.vcf>
+		-ir <reference.fasta>
+		-ia <annotation.gff3>
+		-ig <gene_name>
+		-iv <variants.vcf>
 		-or <output_reference.fasta>
 		-oa <output_annotation.gff3>
 		-os <output_sequences.fasta>
@@ -477,26 +461,19 @@ def translate_biological_regions(sample_records: list, region_type: str, biologi
 	return samples_per_region_sequence, samples_type, types_count, regions_per_sequence_index
 
 def main():
-	"""Prepare files during a Nextstrain-TrepoGen gene workflow for downstream analysis.
+	"""Extract gene specific data for a Nextstrain-TrepoGen gene dataset.
 
 	Description:
-		This function orchestrates the workflow for extracting gene-specific sequences and annotations,
-		processing biological regions, and generating output files required for further analysis and visualization.
-		It performs the following steps:
-		1. Parses command-line arguments.
-		2. Creates a temporary working directory for intermediate files.
-		3. Writes configuration files and builds storage for genomic sequences using MUSIAL.
-		4. Exports gene-specific sequences.
-		5. Parses the reference genome sequence identifier.
-		6. Loads sample sequence records, ensuring the reference is included.
-		7. Processes genome annotation to extract sub-features and biological regions for typing.
-		8. Handles reverse complementing of sequences if the gene is on the reverse strand.
-		9. Writes the extracted reference gene sequence, updated annotation, and sub-feature names to output files.
-		10. Analyzes sample sequences and biological regions to assign types and generate metadata.
-		11. Configures colorings for visualization in Auspice, including custom region type and sequence colorings.
-		12. Writes sample type records to a CSV file.
-		13. Outputs the Auspice configuration as a JSON file.
-		14. Writes the updated sample sequences to a FASTA file.
+		Orchestrates the workflow for extracting gene specific sequences and annotations,
+		processing gene sub-features, and generating output files required for further
+		analysis and visualization. The workflow:
+		- Builds a MUSIAL alignment for the target gene (including its config file).
+		- Parses the genome annotation to extract and type gene sub-features (e.g., topologies,
+		active sites).
+		- Exports the reformatted reference gene sequence, a gap-adjusted GFF3 with updated
+		coordinates (handling reverse complements as needed), and a list of sub-feature names.
+		- Assigns sub-feature types to each sample, producing per-sample metadata.
+		- Generates an Auspice config for Nextstrain (custom color schemes).
 
 	Arguments:
 		None. Arguments are parsed internally via `parse_args()`.
@@ -510,15 +487,15 @@ def main():
 		- Updated annotation (GFF3).
 		- Gene names (TXT).
 		- Per sample region type metadata (CSV).
-		- Auspice configuration (JSON).
 		- Sample sequences (FASTA).
+		- Auspice configuration (JSON).
 	
 	Raises:
 		ValueError: If the reference sequence identifier cannot be parsed from the reference FASTA file.
 
 	Note:
 		This function assumes the existence of several helper functions and external dependencies,
-		such as MUSIAL, Biopython's SeqIO, pandas, and matplotlib colormaps.
+		such as MUSIAL, Biopython's SeqIO, and pandas.
 	"""
 	
 	args = parse_args()
@@ -563,9 +540,7 @@ def main():
 
 		# Analyze the sample sequences and biological regions to create metadata for specified region's types.
 		samples_type_records = {}
-		auspice_config = {
-			"colorings": [],
-		}
+		auspice_config = {"colorings": []}
 		global biological_region_name_map
 		for region in [ 'ecl' ] : # Currently, only ECL regions are processed.
 			samples_per_region_sequence, samples_type, types_count, regions_per_sequence_index = translate_biological_regions( samples_sequence_records.values(), region, biological_regions )
