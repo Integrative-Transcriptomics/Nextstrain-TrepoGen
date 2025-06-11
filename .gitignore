@@ -1,4 +1,4 @@
-builds/*/.work
 source/data/*
 .snakemake
+.work
 .local
