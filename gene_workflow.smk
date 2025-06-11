@@ -47,6 +47,7 @@ rule all:
 		expand("source/data/{source}/variants/{subset}.filtered.vcf", source=sources, subset=subsets),
 		expand(".work/{source}_{subset}_{gene}/{work_file}", source=sources, gene=genes, subset=subsets, work_file=work_files),
 		expand("datasets/{source}_{subset}_{gene}.json", source=sources, gene=genes, subset=subsets),
+		"source/misc/gene_dataset_display_defaults.json", # Independent file for gene dataset display defaults.
 		"source/geo/color.tsv", # Independent file for geo colors.
 		"source/geo/loc.tsv" # Independent file for geo coordinates.
 
@@ -301,6 +302,7 @@ rule export:
 		colors=rules.colors.output,
 		source_config="source/data/{source}/auspice_configuration.json",
 		gene_config=rules.extract.output.gene_auspice_configuration,
+		display_defaults="source/misc/gene_dataset_display_defaults.json",
 		description=rules.describe.output,
 		coordinates="source/geo/loc.tsv",
 		branch_lengths=rules.refine.output.branch_lengths,
@@ -321,7 +323,7 @@ rule export:
 			--metadata {input.metadata} \
 			--metadata-id-columns {params.metadata_id} \
 			--node-data {input.branch_lengths} {input.traits} {input.nucleotide_mutations} {input.amino_acid_mutations} \
-			--auspice-config {input.source_config} {input.gene_config} \
+			--auspice-config {input.source_config} {input.gene_config} {input.display_defaults} \
 			--title {params.title} \
 			--maintainers {params.maintainers} \
 			--build-url {params.build_url} \
