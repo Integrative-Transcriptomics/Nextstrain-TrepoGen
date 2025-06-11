@@ -3,7 +3,7 @@ configfile: "config/data.yaml"
 configfile: "config/genes.yaml"
 
 # genes: List of genes to use in the workflow; see config/config.yaml.
-genes = list(config.get("genes").keys())
+genes = list(config.get("genes", {}).keys())
 
 # sources: List of source datasets to use in the workflow. Expected to match one in source/data/<VAL>.
 sources = ["TPASS-308"]
@@ -18,7 +18,6 @@ source_files = [
 	"meta.csv", # Metadata file in CSV format containing information about the single samples.
 	"meta_colors.tsv", # Metadata file in TSV format containing color information.
 	"auspice_configuration.json", # Auspice configuration file in JSON format providing settings for the dataset.
-	"auspice_description.md" # Auspice description file in Markdown format (MD) providing details about the dataset.
 ]
 
 # work_files: List of files that are generated during the workflow. These files will be generated in the .work/{source}_{subset}_{gene}/ directory.
@@ -32,7 +31,6 @@ work_files = [
 	"meta.csv", # Metadata file in CSV format containing information about the samples.
 	"initial.nwk", # Initial tree in Newick format (NWK) before refinement.
 	"tree.nwk", # Refined tree in Newick format (NWK) after refinement.
-	"auspice.json", # Auspice JSON file containing the final dataset for visualization.
 	"branch_lengths.json", # Branch lengths in JSON format for the tree.
 	"nucleotide_mutations.json", # Nucleotide mutations in JSON format for the tree.
 	"traits.json", # Traits in JSON format for the tree.
@@ -48,6 +46,7 @@ rule all:
 		expand("source/data/{source}/variants/{subset}.tsv", source=sources, subset=subsets),
 		expand("source/data/{source}/variants/{subset}.filtered.vcf", source=sources, subset=subsets),
 		expand(".work/{source}_{subset}_{gene}/{work_file}", source=sources, gene=genes, subset=subsets, work_file=work_files),
+		expand("datasets/{source}_{subset}_{gene}.json", source=sources, gene=genes, subset=subsets),
 		"source/geo/color.tsv", # Independent file for geo colors.
 		"source/geo/loc.tsv" # Independent file for geo coordinates.
 
@@ -73,9 +72,9 @@ rule filter:
 	output:
 		"source/data/{source}/variants/{subset}.filtered.vcf",
 	params:
-		metadata_id=lambda wc: config.get(wc.source).get("meta_identifier", "name strain id"),
-		query_cl=lambda wc: config.get(wc.source).get("filter.query_cl", ""),  # Optional query command line argument in config to filter variants.
-		exclude_cl=lambda wc: config.get(wc.source).get("filter.exclude_cl", ""),  # Optional exclude comman line argument to exclude samples.
+		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
+		query_cl=lambda wc: config[wc.source].get("filter.query_cl", ""),  # Optional query command line argument in config to filter variants.
+		exclude_cl=lambda wc: config[wc.source].get("filter.exclude_cl", ""),  # Optional exclude comman line argument to exclude samples.
 	run:
 		if bool(params.query_cl) or bool(params.exclude_cl):
 			shell(
@@ -107,8 +106,8 @@ rule extract:
 		gene_meta=".work/{source}_{subset}_{gene}/gene_meta.csv",
 		gene_auspice_configuration=".work/{source}_{subset}_{gene}/gene_auspice_configuration.json",
 	params:
-		musial=config.get("musial"),
-		root=lambda wc: config.get(wc.source).get("reference_sample", ""),
+		musial=config.get("musial", "musial"),
+		root=lambda wc: config[wc.source].get("reference_sample", ""),
 	shell:
 		"""
 		python scripts/gene_extract.py \
@@ -134,7 +133,7 @@ rule metadata:
 	output:
 		".work/{source}_{subset}_{gene}/meta.csv"
 	params:
-		metadata_id=lambda wc: config.get(wc.source).get("meta_identifier", "name strain id"),
+		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
 	shell:
 		"""
 		augur merge \
@@ -162,8 +161,8 @@ rule tree:
 	output:
 		".work/{source}_{subset}_{gene}/initial.nwk",
 	params:
-		method_cl=lambda wc: config.get("genes").get(wc.gene).get("tree.method_cl", "--method iqtree"),
-		exclude_cl=lambda wc: config.get("genes").get(wc.gene).get("tree.exclude_cl", ""),
+		method_cl=lambda wc: config["genes"][wc.gene].get("tree", {}).get("method_cl", "--method iqtree"),
+		exclude_cl=lambda wc: config["genes"][wc.gene].get("tree", {}).get("exclude_cl", ""),
 	shell:
 		"""
 		augur tree --alignment {input.alignment} \
@@ -185,10 +184,10 @@ rule refine:
 		seed=config.get("seed", 1),
 		iterations=config.get("refine", {}).get("iterations", 1),
 		precision=config.get("refine", {}).get("precision", 1),
-		metadata_id=lambda wc: config.get(wc.source).get("meta_identifier", "name strain id"),
-		clock_rate_cl=lambda wc: config.get("genes").get(wc.gene).get("refine.clock_rate_cl", ""),
-		root_cl=lambda wc: config.get(wc.source).get("refine.root_cl", ""),
-		year_bounds_cl=lambda wc: config.get(wc.source).get("refine.year_bounds_cl", ""),
+		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
+		clock_rate_cl=lambda wc: config["genes"][wc.gene].get("refine", {}).get("clock_rate_cl", ""),
+		root_cl=lambda wc: config[wc.source].get("refine", {}).get("root_cl", ""),
+		year_bounds_cl=lambda wc: config[wc.source].get("refine", {}).get("year_bounds_cl", ""),
 	shell:
 		"""
 		augur refine --tree {input.tree} \
@@ -243,8 +242,8 @@ rule traits:
 	output:
 		".work/{source}_{subset}_{gene}/traits.json",
 	params:
-		metadata_id=lambda wc: config.get(wc.source).get("meta_identifier", "name strain id"),
-		columns=lambda wc: config.get(wc.source).get("traits.columns", ""),
+		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
+		columns=lambda wc: config[wc.source].get("traits", {}).get("columns", "country date"),
 	shell:
 		"""
 		augur traits --tree {input.tree} \
@@ -279,7 +278,12 @@ rule describe:
 	output:
 		".work/{source}_{subset}_{gene}/description.md",
 	params:
-		content="\n".join([
+		content=lambda wc: "\n".join([
+			config["genes"][wc.gene].get("describe", ""),
+			config.get("describe", {}).get("gene-dataset-postscript", ""),
+			config[wc.source].get("describe", ""),
+			config["subsets"][wc.subset].get("describe", ""),
+			"---",
 			config.get("describe", {}).get("resources", ""),
 			config.get("describe", {}).get("background", ""),
 			config.get("describe", {}).get("funding", "")
@@ -304,12 +308,12 @@ rule export:
 		nucleotide_mutations=rules.ancestral.output,
 		amino_acid_mutations=rules.translate.output,
 	output:
-		".work/{source}_{subset}_{gene}/auspice.json",
+		"datasets/{source}_{subset}_{gene}.json",
 	params:
-		metadata_id=lambda wc: config.get(wc.source).get("meta_identifier", "name strain id"),
-		title=lambda wc: f"'{config.get('export').get('title', 'TrepoGen')} ({wc.gene})'",
-		maintainers=config.get("export").get("maintainers"),
-		build_url=config.get("export").get("build_url"),
+		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
+		title=lambda wc: f"'{config.get('export', {}).get('title', 'undefined')} ({wc.gene})'",
+		maintainers=config.get("export", {}).get("maintainers", "undefined"),
+		build_url=config.get("export", {}).get("build_url", "undefined"),
 	shell:
 		"""
 		augur export v2 \

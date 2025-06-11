@@ -3,5 +3,19 @@ default: &default
     method_cl: "--method iqtree --substitution-model GTR+F+R"
   refine:
     clock_rate_cl: "--clock-rate 3.02e-7 --clock-std-dev 8.55e-8"
+describe:
+  gene-dataset-postscript: |
+    - The <code>Nucleotide diversity of the genome</code> panel provides insights into the variability of biologically relevant gene regions.
+    These were either predicted using [DeepTMHMM](https://dtu.biolib.com/DeepTMHMM/) or curated manually.
+    Clicking on a track will zoom into this region; by clicking on the individual bars, coloring is performed according to amino acid variants instead of nucleotide variants.
+    - <code>Extracellular loop</code> (ECL) amino acid sequences and the <code>Extracellular loop type</code> — the combination of translated ECL sequences — are integrated as metadata.
+    To ensure robust representation, only ECL types present in at least 1% of all source samples are displayed.
+    - TrepoGen gene datasets provide the view of a single gene only and do not represent a comprehensive genomic context!
 genes:
-  Tp0326: *default
+  Tp0326:
+    <<: *default
+    describe: |
+      #### Tp0326
+
+      This gene encodes a putative outer membrane protein (OMP) of _Treponema pallidum_ ssp. _pallidum_, _pertenue_, and _endemicum_.
+      It is part of the OMP repertoire that is relevant for vaccine design.
