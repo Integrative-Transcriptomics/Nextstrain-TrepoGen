@@ -17,5 +17,5 @@ genes:
     describe: |
       #### Tp0326
 
-      This gene encodes a putative outer membrane protein (OMP) of _Treponema pallidum_ ssp. _pallidum_, _pertenue_, and _endemicum_.
-      It is part of the OMP repertoire that is relevant for vaccine design.
+       BamA (TP0326) is the central component of the molecular machinery that inserts newly exported OMPs into the spirochete’s outer membrane.
+       BamA in _Treponema palldium pallidum_ is bipartite and consists of a predicted 16-stranded β-barrel with eight extracellular loops (ECLs) and five polypeptide transport-associated (POTRA) domains within the periplasm.
