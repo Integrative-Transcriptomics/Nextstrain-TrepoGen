@@ -151,7 +151,7 @@ rule colors:
 		".work/{source}_{subset}_{gene}/colors.tsv",
 	shell:
 		"""
-		python scripts/concat_files.py -o {output} {input}
+		cat {input.source_colors} {input.geo_colors} >> {output}
 		"""
 
 # Builds the phylogenetic tree from the sequence alignment.
