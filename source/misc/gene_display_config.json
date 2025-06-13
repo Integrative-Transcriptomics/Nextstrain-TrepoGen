@@ -1,12 +1,12 @@
 {
 	"display_defaults": {
-		"color_by": "subspecies",
+		"color_by": "ecl_type",
 		"geo_resolution": "country",
 		"distance_measure": "div",
 		"map_triplicate": false,
 		"layout": "radial",
 		"tip_label": "Sample Name",
-		"sidebar": "closed",
+		"sidebar": "open",
 		"transmission_lines": false,
 		"language": "english"
 	}
