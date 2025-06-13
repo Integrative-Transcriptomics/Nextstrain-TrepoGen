@@ -1,26 +1,26 @@
 configfile: "config/global.yaml"
-configfile: "config/data.yaml"
-configfile: "config/genes.yaml"
+configfile: "config/source.yaml"
+configfile: "config/gene.yaml"
 
-# genes: List of genes to use in the workflow; see config/config.yaml.
+# genes: List of genes to use in the workflow (cf. config/genes.yaml); a dataset will be generated for each.
 genes = list(config.get("genes", {}).keys())
 
-# sources: List of source datasets to use in the workflow. Expected to match one in source/data/<VAL>.
+# sources: List of source datasets to use in the workflow; expected to match (VAL) in source/data/<VAL>.
 sources = ["TPASS-308", "TPASS-2930"]
 
-# subsets: List of variant subsets to use in the workflow. Expected to match one in source/data/*/variants/<VAL>.vcf
+# subsets: List of variant subsets to use in the workflow; expected to match (VAL) in source/data/*/variants/<VAL>.vcf.
 subsets = ["snv", "snv-indel"]
 
-# source_files: List of files that are part of the source data. These files are expected to be present in the source/data/{source} directory.
+# source_files: List of files that are part of the source data; files are expected to be present in the source/data/{source} directory.
 source_files = [
 	"sequence.fasta", # Reference genome sequence in FASTA format.
 	"annotation.gff3", # Annotation file in GFF3 format.
 	"meta.csv", # Metadata file in CSV format containing information about the single samples.
-	"meta_colors.tsv", # Metadata file in TSV format containing color information.
+	"meta_colors.tsv", # TSV file defining colors for the metadata.
 	"meta_configuration.json", # Auspice configuration file in JSON format providing settings for the meta data of the dataset.
 ]
 
-# work_files: List of files that are generated during the workflow. These files will be generated in the .work/{source}_{subset}_{gene}/ directory.
+# work_files: List of files that are generated during the workflow; files will be generated in the .work/{source}_{subset}_{gene}/ directory.
 work_files = [
 	"reference.fasta", # Reference gene sequence in FASTA format.
 	"annotation.gff3", # Annotation file in GFF3 format for the gene.
@@ -47,7 +47,7 @@ rule all:
 		expand(".work/{source}_{subset}_{gene}/filtered.vcf", source=sources, subset=subsets, gene=genes),
 		expand(".work/{source}_{subset}_{gene}/{work_file}", source=sources, subset=subsets, gene=genes, work_file=work_files),
 		expand("datasets/{source}_{subset}_{gene}.json", source=sources, subset=subsets, gene=genes),
-		"source/misc/gene_display_config.json", # Independent file for gene dataset display defaults.
+		"source/misc/gene_display_configuration.json", # Independent file for gene dataset display defaults.
 		"source/geo/color.tsv", # Independent file for geo colors.
 		"source/geo/loc.tsv" # Independent file for geo coordinates.
 
@@ -73,8 +73,8 @@ rule filter:
 	output:
 		".work/{source}_{subset}_{gene}/filtered.vcf",
 	params:
-		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
-		query_cl=lambda wc: config[wc.source].get("filter", {}).get("query_cl", ""),  # Optional query command line argument in config to filter variants.
+		metadata_id=lambda wc: config["sources"][wc.source].get("meta_identifier", "name strain id"),
+		query_cl=lambda wc: config["sources"][wc.source].get("filter", {}).get("query_cl", ""),  # Optional query command line argument in config to filter variants.
 	run:
 		if bool(params.query_cl):
 			shell(
@@ -106,7 +106,7 @@ rule extract:
 		gene_configuration=".work/{source}_{subset}_{gene}/gene_configuration.json",
 	params:
 		musial=config.get("musial", "musial"),
-		root=lambda wc: config[wc.source].get("reference_sample", ""),
+		root=lambda wc: config["sources"][wc.source].get("reference_sample", ""),
 	shell:
 		"""
 		python scripts/gene_extract.py \
@@ -132,7 +132,7 @@ rule metadata:
 	output:
 		".work/{source}_{subset}_{gene}/meta.csv"
 	params:
-		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
+		metadata_id=lambda wc: config["sources"][wc.source].get("meta_identifier", "name strain id"),
 	shell:
 		"""
 		augur merge \
@@ -141,16 +141,16 @@ rule metadata:
 			--output-metadata {output}
 		"""
 
-# Concatenates metadata color definition files of the source data and the geo information.
+# Concatenates color definition files of the source data as needed for the dataset.
 rule colors:
 	input:
-		source_colors="source/data/{source}/meta_colors.tsv",
+		meta_colors="source/data/{source}/meta_colors.tsv",
 		geo_colors="source/geo/color.tsv",
 	output:
 		".work/{source}_{subset}_{gene}/colors.tsv",
 	shell:
 		"""
-		cat {input.source_colors} {input.geo_colors} >> {output}
+		cat {input.meta_colors} {input.geo_colors} >> {output}
 		"""
 
 # Builds the phylogenetic tree from the sequence alignment.
@@ -181,9 +181,9 @@ rule refine:
 		seed=config.get("seed", 1),
 		iterations=config.get("refine", {}).get("iterations", 1),
 		precision=config.get("refine", {}).get("precision", 1),
-		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
+		metadata_id=lambda wc: config["sources"][wc.source].get("meta_identifier", "name strain id"),
 		clock_rate_cl=lambda wc: config["genes"][wc.gene].get("refine", {}).get("clock_rate_cl", ""),
-		year_bounds_cl=lambda wc: config[wc.source].get("refine", {}).get("year_bounds_cl", ""),
+		year_bounds_cl=lambda wc: config["sources"][wc.source].get("refine", {}).get("year_bounds_cl", ""),
 	shell:
 		"""
 		augur refine --tree {input.tree} \
@@ -237,8 +237,8 @@ rule traits:
 	output:
 		".work/{source}_{subset}_{gene}/traits.json",
 	params:
-		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
-		columns=lambda wc: config[wc.source].get("traits", {}).get("columns", "country date"),
+		metadata_id=lambda wc: config["sources"][wc.source].get("meta_identifier", "name strain id"),
+		columns=lambda wc: config["sources"][wc.source].get("traits", {}).get("columns", "country date"),
 	shell:
 		"""
 		augur traits --tree {input.tree} \
@@ -281,14 +281,14 @@ rule describe:
 		".work/{source}_{subset}_{gene}/description.md",
 	params:
 		content=lambda wc: "\n".join([
-			config["genes"][wc.gene].get("describe", ""),
-			config.get("describe", {}).get("gene-dataset-postscript", ""),
-			config[wc.source].get("describe", ""),
-			config["subsets"][wc.subset].get("describe", ""),
+			config["describe"]["gene"][wc.gene],
+			config["describe"]["gene"]["postscript"],
+			config["describe"]["source"][wc.source],
+			config["describe"]["subset"][wc.subset],
 			"---",
-			config.get("describe", {}).get("resources", ""),
-			config.get("describe", {}).get("background", ""),
-			config.get("describe", {}).get("funding", "")
+			config["describe"]["resources"],
+			config["describe"]["background"],
+			config["describe"]["funding"]
 		]),
 	shell:
 		"""
@@ -303,7 +303,7 @@ rule export:
 		colors=rules.colors.output,
 		meta_config="source/data/{source}/meta_configuration.json",
 		gene_config=rules.extract.output.gene_configuration,
-		display_config="source/misc/gene_display_config.json",
+		display_config="source/misc/gene_display_configuration.json",
 		description=rules.describe.output,
 		coordinates="source/geo/loc.tsv",
 		branch_lengths=rules.refine.output.branch_lengths,
@@ -313,7 +313,7 @@ rule export:
 	output:
 		"datasets/{source}_{subset}_{gene}.json",
 	params:
-		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
+		metadata_id=lambda wc: config["sources"][wc.source].get("meta_identifier", "name strain id"),
 		title=lambda wc: f"'{config.get('export', {}).get('title', 'undefined')} ({wc.gene})'",
 		maintainers=config.get("export", {}).get("maintainers", "undefined"),
 		build_url=config.get("export", {}).get("build_url", "undefined"),

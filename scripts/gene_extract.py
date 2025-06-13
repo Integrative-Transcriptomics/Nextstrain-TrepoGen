@@ -594,7 +594,7 @@ def main():
 				)
 					
 		# If the defined root identifier is present in the records, remove it; otherwise, set it as the identifier for the reference sequence.
-		if args.root is not None :
+		if args.root is not None  and args.root :
 			if args.root in samples_sequence_records :
 				del samples_type_records[ "reference" ]
 				del samples_sequence_records[ "reference" ]
