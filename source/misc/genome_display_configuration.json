@@ -1,0 +1,13 @@
+{
+	"display_defaults": {
+		"color_by": "subspecies",
+		"geo_resolution": "country",
+		"distance_measure": "div",
+		"map_triplicate": false,
+		"layout": "rect",
+		"tip_label": "Sample Name",
+		"sidebar": "closed",
+		"transmission_lines": false,
+		"language": "english"
+	}
+}

@@ -1,0 +1,26 @@
+genome_default: &genome_default
+  tree:
+    method_cl: "--method iqtree --substitution-model HKY+F+ASC+R2 --tree-builder-args='-safe -pathogen'"
+  refine:
+    clock_rate_cl: "--clock-rate 3.02e-7 --clock-std-dev 8.55e-8"
+genomes:
+  TPASS-308:
+    <<: *genome_default
+  TPASS-2930:
+    <<: *genome_default
+describe:
+  genome :
+    TPASS-308: |
+      #### Genome
+
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    TPASS-2930: |
+      #### Genome
+
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+      Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
