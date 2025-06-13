@@ -12,8 +12,6 @@ Usage:
 """
 import json
 import argparse
-from shutil import copyfile
-from os import path
 
 """Fixed color map for genome annotations in Auspice JSON files; based on the managua color map (https://www.fabiocrameri.ch/colourmaps/)."""
 color_map = {
