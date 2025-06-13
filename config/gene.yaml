@@ -21,8 +21,6 @@ describe:
     Tp0326: |
       #### Tp0326
 
-      ![Representative image of Tp0326. The protein structure (AF-A0A0H3BIL6-F1-v4 AlphaFold Protein Structure Database) was visualized using M* (D. Sehnal, et al.; 2021; Mol* Viewer: modern web app for 3D visualization and analysis of large biomolecular structures; Nucleic Acids Research; 49:W431-W437)](https://github.com/Integrative-Transcriptomics/Nextstrain-TrepoGen/blob/main/media/TP0326_A0A0H3BIL6.png)
-
       BamA (TP0326) is the central component of the molecular machinery that inserts newly exported OMPs into the spirochete’s outer membrane.
       BamA in _T. pallidum_ is bipartite and consists of a predicted 16-stranded β-barrel with eight extracellular loops (ECLs) and five polypeptide transport-associated (POTRA) domains within the periplasm.
     Tp0865: |
