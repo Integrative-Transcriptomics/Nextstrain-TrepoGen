@@ -206,7 +206,7 @@ rule traits:
 			--output-node-data {output}
 		"""
 
-# ...
+# Assign clades to the nodes of the phylogenetic tree based on the provided clade definitions.
 rule clades:
     input:
         tree=rules.refine.output.tree,
