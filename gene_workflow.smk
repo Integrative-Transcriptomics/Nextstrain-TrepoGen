@@ -17,23 +17,23 @@ source_files = [
 	"annotation.gff3", # Annotation file in GFF3 format.
 	"meta.csv", # Metadata file in CSV format containing information about the single samples.
 	"meta_colors.tsv", # Metadata file in TSV format containing color information.
-	"auspice_configuration.json", # Auspice configuration file in JSON format providing settings for the dataset.
+	"meta_configuration.json", # Auspice configuration file in JSON format providing settings for the meta data of the dataset.
 ]
 
 # work_files: List of files that are generated during the workflow. These files will be generated in the .work/{source}_{subset}_{gene}/ directory.
 work_files = [
 	"reference.fasta", # Reference gene sequence in FASTA format.
 	"annotation.gff3", # Annotation file in GFF3 format for the gene.
-	"gene_features.txt", # Text file containing names of features in the gene.
 	"sequences.fasta", # Sample sequences in FASTA format for the gene.
+	"gene_features.txt", # Text file containing names of features in the gene.
 	"gene_meta.csv", # Types file in CSV format containing information about selected feature types, e.g. extracellular domains.
-	"gene_auspice_configuration.json", # Auspice configuration file in JSON format for the selected feature types.
+	"gene_configuration.json", # Auspice configuration file in JSON format for the selected feature types.
 	"meta.csv", # Metadata file in CSV format containing information about the samples.
 	"initial.nwk", # Initial tree in Newick format (NWK) before refinement.
 	"tree.nwk", # Refined tree in Newick format (NWK) after refinement.
+	"traits.json", # Traits in JSON format for the tree.
 	"branch_lengths.json", # Branch lengths in JSON format for the tree.
 	"nucleotide_mutations.json", # Nucleotide mutations in JSON format for the tree.
-	"traits.json", # Traits in JSON format for the tree.
 	"amino_acid_mutations.json", # Amino acid mutations in JSON format for the tree.
 	"description.md", # Description file in Markdown format (MD) for the dataset.
 ]
@@ -44,10 +44,10 @@ rule all:
 		expand("source/data/{source}/{source_file}", source=sources, source_file=source_files),
 		expand("source/data/{source}/variants/{subset}.vcf", source=sources, subset=subsets),
 		expand("source/data/{source}/variants/{subset}.tsv", source=sources, subset=subsets),
-		expand("source/data/{source}/variants/{subset}.filtered.vcf", source=sources, subset=subsets),
-		expand(".work/{source}_{subset}_{gene}/{work_file}", source=sources, gene=genes, subset=subsets, work_file=work_files),
-		expand("datasets/{source}_{subset}_{gene}.json", source=sources, gene=genes, subset=subsets),
-		"source/misc/gene_dataset_display_defaults.json", # Independent file for gene dataset display defaults.
+		expand(".work/{source}_{subset}_{gene}/filtered.vcf", source=sources, subset=subsets, gene=genes),
+		expand(".work/{source}_{subset}_{gene}/{work_file}", source=sources, subset=subsets, gene=genes, work_file=work_files),
+		expand("datasets/{source}_{subset}_{gene}.json", source=sources, subset=subsets, gene=genes),
+		"source/misc/gene_display_config.json", # Independent file for gene dataset display defaults.
 		"source/geo/color.tsv", # Independent file for geo colors.
 		"source/geo/loc.tsv" # Independent file for geo coordinates.
 
@@ -71,13 +71,12 @@ rule filter:
 		index="source/data/{source}/variants/{subset}.tsv",
 		metadata="source/data/{source}/meta.csv",
 	output:
-		"source/data/{source}/variants/{subset}.filtered.vcf",
+		".work/{source}_{subset}_{gene}/filtered.vcf",
 	params:
 		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
-		query_cl=lambda wc: config[wc.source].get("filter.query_cl", ""),  # Optional query command line argument in config to filter variants.
-		exclude_cl=lambda wc: config[wc.source].get("filter.exclude_cl", ""),  # Optional exclude comman line argument to exclude samples.
+		query_cl=lambda wc: config[wc.source].get("filter", {}).get("query_cl", ""),  # Optional query command line argument in config to filter variants.
 	run:
-		if bool(params.query_cl) or bool(params.exclude_cl):
+		if bool(params.query_cl):
 			shell(
 				"""
 				augur filter --sequences {input.variants} \
@@ -85,8 +84,7 @@ rule filter:
 					--metadata {input.metadata} \
 					--metadata-id-columns {params.metadata_id} \
 					--output-sequences {output} \
-					{params.query_cl} \
-					{params.exclude_cl}
+					{params.query_cl}
 				"""
 			)
 		else:
@@ -105,7 +103,7 @@ rule extract:
 		features=".work/{source}_{subset}_{gene}/gene_features.txt",
 		sequences=".work/{source}_{subset}_{gene}/sequences.fasta",
 		gene_meta=".work/{source}_{subset}_{gene}/gene_meta.csv",
-		gene_auspice_configuration=".work/{source}_{subset}_{gene}/gene_auspice_configuration.json",
+		gene_configuration=".work/{source}_{subset}_{gene}/gene_configuration.json",
 	params:
 		musial=config.get("musial", "musial"),
 		root=lambda wc: config[wc.source].get("reference_sample", ""),
@@ -121,7 +119,7 @@ rule extract:
 			-og {output.features} \
 			-os {output.sequences} \
 			-ot {output.gene_meta} \
-			-oc {output.gene_auspice_configuration} \
+			-oc {output.gene_configuration} \
 			-m {params.musial} \
 			-q {params.root}
 		"""
@@ -163,13 +161,11 @@ rule tree:
 		".work/{source}_{subset}_{gene}/initial.nwk",
 	params:
 		method_cl=lambda wc: config["genes"][wc.gene].get("tree", {}).get("method_cl", "--method iqtree"),
-		exclude_cl=lambda wc: config["genes"][wc.gene].get("tree", {}).get("exclude_cl", ""),
 	shell:
 		"""
 		augur tree --alignment {input.alignment} \
 			--output {output} \
-			{params.method_cl} \
-			{params.exclude_cl}
+			{params.method_cl}
 		"""
 
 # Refines the phylogenetic tree; performs date inference and branch length estimation.
@@ -187,7 +183,6 @@ rule refine:
 		precision=config.get("refine", {}).get("precision", 1),
 		metadata_id=lambda wc: config[wc.source].get("meta_identifier", "name strain id"),
 		clock_rate_cl=lambda wc: config["genes"][wc.gene].get("refine", {}).get("clock_rate_cl", ""),
-		root_cl=lambda wc: config[wc.source].get("refine", {}).get("root_cl", ""),
 		year_bounds_cl=lambda wc: config[wc.source].get("refine", {}).get("year_bounds_cl", ""),
 	shell:
 		"""
@@ -208,7 +203,6 @@ rule refine:
 			--seed {params.seed} \
 			--output-tree {output.tree} \
 			--output-node-data {output.branch_lengths} \
-			{params.root_cl} \
 			{params.clock_rate_cl} \
 			{params.year_bounds_cl}
 		"""
@@ -254,7 +248,7 @@ rule traits:
 			--output-node-data {output}
 		"""
 
-# Translates nucleotide mutations of specified gene features into amino acid mutations.
+# Translates nucleotide sequences of specified gene features into amino acid sequences.
 rule translate:
 	input:
 		tree=rules.refine.output.tree,
@@ -277,7 +271,7 @@ rule translate:
 		)
 		shell(
 			"""
-			python scripts/gene_recolor_annotations.py -f {output}
+			python scripts/gene_color_annotations.py -f {output}
 			"""
 		)
 
@@ -307,9 +301,9 @@ rule export:
 		tree=rules.refine.output.tree,
 		metadata=rules.metadata.output,
 		colors=rules.colors.output,
-		source_config="source/data/{source}/auspice_configuration.json",
-		gene_config=rules.extract.output.gene_auspice_configuration,
-		display_defaults="source/misc/gene_dataset_display_defaults.json",
+		meta_config="source/data/{source}/meta_configuration.json",
+		gene_config=rules.extract.output.gene_configuration,
+		display_config="source/misc/gene_display_config.json",
 		description=rules.describe.output,
 		coordinates="source/geo/loc.tsv",
 		branch_lengths=rules.refine.output.branch_lengths,
@@ -330,7 +324,7 @@ rule export:
 			--metadata {input.metadata} \
 			--metadata-id-columns {params.metadata_id} \
 			--node-data {input.branch_lengths} {input.traits} {input.nucleotide_mutations} {input.amino_acid_mutations} \
-			--auspice-config {input.source_config} {input.gene_config} {input.display_defaults} \
+			--auspice-config {input.meta_config} {input.gene_config} {input.display_config} \
 			--title {params.title} \
 			--maintainers {params.maintainers} \
 			--build-url {params.build_url} \
