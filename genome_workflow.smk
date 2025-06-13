@@ -7,7 +7,7 @@ configfile: "config/genome.yaml"
 genes = list(config.get("genes", {}).keys())
 
 # sources: List of source datasets to use in the workflow; expected to match (VAL) in source/data/<VAL>.
-sources = ["TPASS-2930"]
+sources = ["TPASS-308"]
 
 # subsets: List of variant subsets to use in the workflow; expected to match (VAL) in source/data/*/variants/<VAL>.vcf.
 subsets = ["snv"]
@@ -23,6 +23,7 @@ source_files = [
 	"clades.tsv", # (Optional empty) TSV file defining clades for the dataset.
 	"clades_colors.tsv", # (Optional empty) TSV file defining colors for the clades.
 	"clades_configuration.json", # (Optional empty) Auspice configuration file in JSON format providing settings for the clades of the dataset.
+	"resistance_mutations.tsv", # (Optional empty) TSV file defining resistance mutations for the dataset.
 ]
 
 # work_files: List of files that are generated during the workflow; files will be generated in the .work/{source}_{subset}_genome/ directory.
@@ -224,6 +225,25 @@ rule clades:
             --output-node-data {output}
         """
 
+# Computes resistances based on provided resistance mutations.
+rule resistances:
+	input:
+		variants=rules.ancestral.output.ancestral_variants,
+		reference="source/data/{source}/sequence.fasta",
+		features="source/data/{source}/resistance_mutations.tsv",
+	output:
+		".work/{source}_{subset}_genome/resistances.json",
+	shell:
+		"""
+		augur sequence-traits --ancestral-sequences {input.variants} \
+			--vcf-reference {input.reference} \
+			--features {input.features} \
+			--output-node-data {output} \
+			--count traits \
+			--label 'Resistances' \
+			--output-node-data {output}
+		"""
+
 # Translates nucleotide sequences of specified genes into amino acid sequences.
 rule translate:
 	input:
@@ -256,7 +276,7 @@ rule describe:
 		content=lambda wc: "\n".join([
 			config["describe"]["genome"][wc.source],
 			config["describe"]["source"][wc.source],
-			config["describe"]["subset"][wc.source],
+			config["describe"]["subset"][wc.subset],
 			"---",
 			config["describe"]["resources"],
 			config["describe"]["background"],
@@ -281,6 +301,7 @@ rule export:
 		traits=rules.traits.output,
 		clades=rules.clades.output,
 		clades_config="source/data/{source}/clades_configuration.json",
+		resistances=rules.resistances.output,
 		nucleotide_mutations=rules.ancestral.output.node_data,
 		amino_acid_mutations=rules.translate.output,
 	output:
@@ -296,7 +317,7 @@ rule export:
 			--tree {input.tree} \
 			--metadata {input.metadata} \
 			--metadata-id-columns {params.metadata_id} \
-			--node-data {input.branch_lengths} {input.traits} {input.clades} {input.nucleotide_mutations} {input.amino_acid_mutations} \
+			--node-data {input.branch_lengths} {input.traits} {input.clades} {input.resistances} {input.nucleotide_mutations} {input.amino_acid_mutations} \
 			--auspice-config {input.meta_config} {input.display_defaults} {input.clades_config} \
 			--title {params.title} \
 			--maintainers {params.maintainers} \
