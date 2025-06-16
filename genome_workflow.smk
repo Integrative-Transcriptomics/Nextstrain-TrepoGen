@@ -7,7 +7,7 @@ configfile: "config/genome.yaml"
 genes = list(config.get("genes", {}).keys())
 
 # sources: List of source datasets to use in the workflow; expected to match (VAL) in source/data/<VAL>.
-sources = ["TPASS-308"]
+sources = ["TPASS-2930"]
 
 # subsets: List of variant subsets to use in the workflow; expected to match (VAL) in source/data/*/variants/<VAL>.vcf.
 subsets = ["snv"]
@@ -148,6 +148,7 @@ rule refine:
 			--metadata {input.metadata} \
 			--metadata-id-columns {params.metadata_id} \
 			--timetree \
+			--use-fft \
 			--max-iter {params.iterations} \
 			--covariance \
 			--keep-polytomies \

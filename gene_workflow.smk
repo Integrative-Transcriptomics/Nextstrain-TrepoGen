@@ -191,6 +191,7 @@ rule refine:
 			--metadata {input.metadata} \
 			--metadata-id-columns {params.metadata_id} \
 			--timetree \
+			--use-fft \
 			--max-iter {params.iterations} \
 			--covariance \
 			--keep-polytomies \
