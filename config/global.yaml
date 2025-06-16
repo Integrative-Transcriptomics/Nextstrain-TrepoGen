@@ -2,7 +2,7 @@ seed: 1
 musial: "/mnt/c/Users/siha/Desktop/Tools/MUSIAL-v2.4.1.jar"
 refine:
   precision: 3
-  iterations: 3
+  iterations: 2
 export:
   title: "Global perspective on Treponema pallidum"
   maintainers: "'Simon Hackl <https://uni-tuebingen.de/fakultaeten/mathematisch-naturwissenschaftliche-fakultaet/fachbereiche/informatik/lehrstuehle/integrative-transkriptomik/gruppe/simon-hackl/>'"

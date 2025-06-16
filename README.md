@@ -14,6 +14,10 @@ We aim at democratizing access to _T. pallidum_ genomic diversity data by develo
 
 Our Nextstrain datasets are currently private. We’re actively preparing to release it to the public soon and will update this repository with more details once available.
 
+### 📑 Further Information
+
+Further information on the details of Nextstrain-TrepoGen can be found in [this repositories Wiki](https://github.com/Integrative-Transcriptomics/Nextstrain-TrepoGen/wiki).
+
 ### 🙋 [What is Nextstrain?](https://docs.nextstrain.org/en/latest/learn/about.html)
 
 Further background on Nextstrain can be found in the [Exploring interactive phylogenies with Auspice](https://neherlab.org/201901_krisp_auspice.html) tutorial and the [Nextstrain Glossary](https://docs.nextstrain.org/en/latest/reference/glossary.html).
