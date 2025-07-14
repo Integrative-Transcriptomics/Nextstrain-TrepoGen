@@ -6,11 +6,21 @@ genome_default: &genome_default
 genomes:
   TPASS-308:
     <<: *genome_default
+  TPASS-2588:
+    <<: *genome_default
   TPASS-2930:
     <<: *genome_default
 describe:
   genome:
     TPASS-308: |
+      #### Genome
+
+      This genome dataset is constructed from whole‐genome variants, featuring the complete phylogenetic context of _T. pallidum_.
+      Prior to phylogenetic inference, curated recombinant regions were masked to avoid spurious tree building.
+      - The <code>Nucleotide diversity of genome</code> panel features all unmasked positions and individual genes that are also available as gene datasets are highlighted.
+      - Clades are currently assigned via a hierarchical‐clustering scheme.
+      - Known macrolide resistance mutations, mediated by 23S rRNA mutations G2106A and G2107A, are available via the metadata.
+    TPASS-2588: |
       #### Genome
 
       This genome dataset is constructed from whole‐genome variants, featuring the complete phylogenetic context of _T. pallidum_.
