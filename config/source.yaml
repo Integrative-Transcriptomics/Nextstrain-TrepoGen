@@ -10,16 +10,7 @@ sources:
     reference_sample: "CP004011"
     meta_identifier: "sra"
     filter:
-      query_cl: "--query-columns ambiguity:float coverage:float --query '(coverage >= 3) & (ambiguity <= 20)'"
-    refine:
-      year_bounds_cl: "--year-bounds 2023 2000"
-    traits:
-      columns: "subspecies country region date"
-  TPASS-2930:
-    reference_sample: "CP004011"
-    meta_identifier: "sra"
-    filter:
-      query_cl: "--query-columns ambiguity:float coverage:float --query '(coverage >= 3) & (ambiguity <= 20)'"
+      query_cl: "--query-columns ambiguity:float coverage:float --query '(coverage >= 3) & (ambiguity <= 25)'"
     refine:
       year_bounds_cl: "--year-bounds 2023 2000"
     traits:
@@ -42,11 +33,4 @@ describe:
       #### Genetic Data
 
       - This data source (TPASS-2588) comprises genetic data from 2,588 individual _Treponema pallidum_ ssp. _pallidum_, _pertenue_, and _endemicum_ samples, each genotyped against the SS14 reference genome [NC_021508.1](https://www.ncbi.nlm.nih.gov/nuccore/NC_021508.1/).
-      - Samples exhibiting mean coverage below 3× or more than 20% no-call (ambiguous) positions (n=377) have been masked to minimize the impact of low quality data.
-      - Accompanying metadata includes the sampling <code>Date</code>, <code>Country</code>, and <code>Region</code>; <code>Subspecies</code> and <code>Lineage</code> designations (only for ssp. _pallidum_ as Nichols or SS14); and <code>Mean coverage</code> and <code>Ambiguity</code> to support quality control.
-    TPASS-2930: |
-      #### Genetic Data
-
-      - This data source (TPASS-2930) comprises genetic data from 2,930 individual _Treponema pallidum_ ssp. _pallidum_, _pertenue_, and _endemicum_ samples, each genotyped against the SS14 reference genome [NC_021508.1](https://www.ncbi.nlm.nih.gov/nuccore/NC_021508.1/).
-      - Samples exhibiting mean coverage below 3× or more than 20% no-call (ambiguous) positions (n=377) have been masked to minimize the impact of low quality data.
       - Accompanying metadata includes the sampling <code>Date</code>, <code>Country</code>, and <code>Region</code>; <code>Subspecies</code> and <code>Lineage</code> designations (only for ssp. _pallidum_ as Nichols or SS14); and <code>Mean coverage</code> and <code>Ambiguity</code> to support quality control.
