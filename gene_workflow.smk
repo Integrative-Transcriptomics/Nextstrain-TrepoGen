@@ -6,7 +6,7 @@ configfile: "config/gene.yaml"
 genes = list(config.get("genes", {}).keys())
 
 # sources: List of source datasets to use in the workflow; expected to match (VAL) in source/data/<VAL>.
-sources = ["TPASS-308", "TPASS-2930"]
+sources = ["TPASS-2588"]
 
 # subsets: List of variant subsets to use in the workflow; expected to match (VAL) in source/data/*/variants/<VAL>.vcf.
 subsets = ["snv", "snv-indel"]

@@ -7,7 +7,7 @@ configfile: "config/genome.yaml"
 genes = list(config.get("genes", {}).keys())
 
 # sources: List of source datasets to use in the workflow; expected to match (VAL) in source/data/<VAL>.
-sources = ["TPASS-2930"]
+sources = ["TPASS-2588"]
 
 # subsets: List of variant subsets to use in the workflow; expected to match (VAL) in source/data/*/variants/<VAL>.vcf.
 subsets = ["snv"]
@@ -161,6 +161,7 @@ rule refine:
 			--seed {params.seed} \
 			--output-tree {output.tree} \
 			--output-node-data {output.branch_lengths} \
+			--verbosity 6 \
 			{params.clock_rate_cl} \
 			{params.year_bounds_cl}
 		"""
@@ -326,5 +327,6 @@ rule export:
 			--description {input.description} \
 			--colors {input.colors} \
 			--lat-longs {input.coordinates} \
-			--output {output}
+			--output {output} \
+			--include-root-sequence
 		"""
