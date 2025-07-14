@@ -8,7 +8,7 @@ Further background on Nextstrain can be found in the [Exploring interactive phyl
 
 ### Background
 
-Syphilis is a resurging global health threat caused by _Treponema pallidum_ ssp. _pallidum_, with additional disease burden from the closely related subspecies _pertenue_ and _endemicum_, the causative agents of yaws and bejel, respectively. By 2025 whole genome sequencing data for more than 3,000 _T. pallidum_ strains were available in the NCBI Sequence Read Archive. However, more than 80% of these lack publicly available genome assemblies and, more critically, systematic annotation. This severely limits their utility for molecular epidemiology, resistance surveillance, and vaccine development.
+[Syphilis](https://www.who.int/news-room/fact-sheets/detail/syphilis) is a resurging global health threat caused by _Treponema pallidum_ ssp. _pallidum_, with additional disease burden from the closely related subspecies _pertenue_ and _endemicum_, the causative agents of yaws and bejel, respectively. By 2025 whole genome sequencing data for more than 3,000 _T. pallidum_ strains were available in the NCBI Sequence Read Archive. However, more than 80% of these lack publicly available genome assemblies and, more critically, systematic annotation. This severely limits their utility for molecular epidemiology, resistance surveillance, and vaccine development.
 
 ### Objectives
 
